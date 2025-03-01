@@ -5,10 +5,30 @@ function App() {
   const emptyArr = ['', '', '', ''];
   const refs = [useRef(), useRef(), useRef(), useRef()];
   const [inputs, setInputs] = useState(emptyArr);
+  const [missing, setMissing] = useState(emptyArr);
+  const CODE = '1234';
 
   useEffect(()=>{
     refs[0].current.focus();
   },[])
+
+  const handleSubmit = () => {
+    const missed = inputs.map((item, i)=>{
+      if (item === '')
+        return i;
+    }).filter((item)=> (item || item === 0));
+    console.log("missed item", missed)
+    setMissing(missed);
+
+    if(missed.length){
+      return
+    }
+
+    const userInput = inputs.join('');
+    const isMatch = userInput === CODE;
+    const msg = isMatch ? 'Code is valid' : 'Code is not valid'
+    alert(msg);
+  }
 
   const handleInputChange = (e, index) => {
     const val = e.target.value;
@@ -43,7 +63,7 @@ function App() {
   const handlePaste = (e) => {
     const data = e.clipboardData.getData('text');
     console.log('Pasted data', data);
-    if(!Number(data) || !data.length == inputs.length)
+    if(!Number(data) || data.length !== inputs.length)
       return;
     const pasteCode = data.split('');
     setInputs (pasteCode);
@@ -62,9 +82,11 @@ function App() {
           onChange={(e)=>handleInputChange(e,i)}
           onKeyDown={(e)=>handleKeyDown(e,i)}
           onPaste={handlePaste}
-          maxLength={1}/>
+          maxLength={1}
+          className={missing.includes(i) ? 'error' : ''}
+          />
         })}</div>
-        <button>Submit</button>
+        <button onClick={handleSubmit}>Submit</button>
       </div>
     </div>
   )
