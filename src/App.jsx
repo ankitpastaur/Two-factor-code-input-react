@@ -15,9 +15,39 @@ function App() {
     console.log(val, index);
     if(!Number(val))
       return;
+    if(index < inputs.length-1)
+      refs[index + 1].current.focus();
+    
     const copyInputs = [...inputs];
     copyInputs[index] = val;
     setInputs(copyInputs)
+  }
+
+  console.log('inputs', inputs);
+  
+
+  const handleKeyDown = (e, index) =>{
+    console.log(e.keyCode, index);
+    if(e.keyCode === 8){
+      const copyInputs = [...inputs];
+      copyInputs[index] = ''
+      setInputs(copyInputs)
+    }
+
+    if(index > 0){
+      refs[index - 1].current.focus();
+    }
+    
+  }
+
+  const handlePaste = (e) => {
+    const data = e.clipboardData.getData('text');
+    console.log('Pasted data', data);
+    if(!Number(data) || !data.length == inputs.length)
+      return;
+    const pasteCode = data.split('');
+    setInputs (pasteCode);
+    refs[inputs.length-1].current.focus()
   }
 
   return (
@@ -30,6 +60,8 @@ function App() {
           value={inputs[i]}
           ref={refs[i]}
           onChange={(e)=>handleInputChange(e,i)}
+          onKeyDown={(e)=>handleKeyDown(e,i)}
+          onPaste={handlePaste}
           maxLength={1}/>
         })}</div>
         <button>Submit</button>
